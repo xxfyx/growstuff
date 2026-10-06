@@ -1,20 +1,56 @@
 - content_for :title, @owner ? "#{@owner}'s gardens" : "Everyone's gardens"
 
-= render 'nav', owner: @owner, show_all: @show_all
+- content_for :scripts do
+  = javascript_include_tag 'react_islands', defer: true
 
-.pagination
-  = page_entries_info @gardens
-  = will_paginate @gardens
+%h1= @owner ? "#{@owner}'s gardens" : "Everyone's gardens"
+
+- content_for :breadcrumbs do
+  - if @owner
+    %li.breadcrumb-item= link_to 'Gardens', gardens_path
+    %li.breadcrumb-item.active= link_to "#{@owner}'s gardens", member_gardens_path(@owner)
+  - else
+    %li.breadcrumb-item.active= link_to 'Gardens', gardens_path
 
 .row
-  - if @gardens.empty?
-    %p There are no gardens to display.
-  - else
-    - @gardens.each do |garden|
-      .col-md-6
-        = render partial: 'gardens/thumbnail', locals: { garden: garden }
+  .col-md-2
+    %small.d-block.sidebar-inset
+      %a{href: "#content"}
+        Skip to main content
+    = render 'layouts/nav', model: Garden
+    - if @owner.present?
+      %hr/
+      = render @owner
+      .inactive-gardens-link.sidebar-inset.mt-3
+        = link_to 'Inactive gardens', member_inactive_gardens_path(@owner), class: 'd-block'
+        %small.text-muted
+          Gardens no longer in use. Their plantings are kept here as a record of what was grown.
 
-.pagination
-  = page_entries_info @gardens
-  = will_paginate @gardens
+  .col-md-10#content
+    - if @gardens.empty?
+      %p There are no gardens to display.
+      - if can?(:create, Garden) && @owner == current_member
+        = link_to 'Add a garden', new_garden_path, class: 'btn btn-primary'
 
+    - else
+      %section
+        %h2= page_entries_info @gardens
+        = will_paginate @gardens
+
+      - if @show_jump_to == true
+        %section
+          .jump
+            jump to:
+            - @gardens.each do |garden|
+              .badge.text-bg-primary
+                - if @owner.present?
+                  = link_to garden.name, member_gardens_path(@owner, anchor: "garden-#{garden.id}")
+                - else
+                  = link_to garden.name, gardens_path(anchor: "garden-#{garden.id}")
+      = react_component 'GardenCards', garden_cards_props(@gardens, owner: @owner)
+      %noscript
+        %p The garden cards need JavaScript to display.
+
+      .row
+        .col-12= page_entries_info @gardens
+        .col-12= will_paginate @gardens

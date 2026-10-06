@@ -1,0 +1,567 @@
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background-color: $beige;
+  font-family: $default-font;
+}
+
+.navbar {
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  min-height: 3.5rem;
+  padding: 0.625rem 1rem;
+}
+.navbar-brand {
+  display: inline-flex;
+  align-items: center;
+  height: 2.25rem;
+  padding: 0;
+
+  .site-name {
+    font-family: "Modak", cursive;
+    font-size: 3em;
+    margin: 0.3em;
+  }
+
+  img {
+    width: auto;
+    height: 100%;
+  }
+}
+
+#navbar-search {
+  padding-left: 1em;
+
+  // Bootstrap 5's input-group shrinks to nothing inside a shrink-to-fit parent.
+  .input-group {
+    min-width: 18rem;
+  }
+
+  .input-group {
+    input {
+      background-color: $white;
+      color: $black;
+    }
+
+    input::placeholder {
+      color: $navbar-default-link-color;
+    }
+  }
+}
+
+.navbar .btn-signup,
+.navbar .btn-signin {
+  background-color: $green;
+  color: $white;
+  margin: 3px;
+}
+
+.homepage-blurb .site-name {
+  font-size: 5em;
+}
+
+.ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+a {
+  color: $green;
+}
+
+a:hover {
+  color: $brown;
+  text-decoration: none;
+}
+
+.badge a {
+  color: $white;
+}
+
+.badge a:hover {
+  text-decoration: underline;
+}
+
+h1 {
+  font-size: 250%;
+}
+
+h2 {
+  font-size: 150%;
+}
+
+h3 {
+  font-size: 120%;
+}
+
+section {
+  margin: 0.5em 0 0;
+  padding: 0 0 1em;
+
+  h2 {
+    background-color: $green;
+    box-shadow: 1px 1px 1px 1px darken($beige, 20%);
+    color: $white;
+    font-weight: normal;
+    padding: 0.2em;
+
+    a {
+      color: $white;
+    }
+  }
+
+  .card {
+    background: $white;
+    box-shadow: 1px 3px 3px 1px darken($beige, 20%);
+    cursor: pointer;
+    transition:
+      0.1s transform cubic-bezier(0.155, 1.105, 0.295, 1.12),
+      0.1s box-shadow,
+      0.1s -webkit-transform cubic-bezier(0.155, 1.105, 0.295, 1.12);
+  }
+
+  .card:hover {
+    box-shadow:
+      1px 3px 3px 1px darken($beige, 30%);
+  }
+}
+
+.layout-actions {
+  border: 1px solid lighten($green, 20%);
+  float: right;
+}
+
+.index-cards {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+
+  .card {
+    background: $white;
+    border-radius: 5%;
+    margin: 0.5em 0.5em 0.5em 0;
+    width: 200px;
+    align-items: stretch;
+    justify-content: space-between;
+
+    .img-card {
+      border-top-left-radius: 5%;
+      border-top-right-radius: 5%;
+    }
+  }
+
+  .card-double {
+    width: 400px;
+  }
+
+  .card-finished {
+    background: darken($beige, 10%);
+
+    a {
+      color: $brown;
+    }
+  }
+}
+
+.img-cover,
+.card .img-card {
+  height: 200px;
+  object-fit: cover;
+  width: 100%;
+}
+
+.card {
+  margin-bottom: 1em;
+
+  a:hover {
+    background-color: $beige;
+    color: $blue;
+  }
+}
+
+.facts {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+
+  .card {
+    margin: 1em;
+    max-width: 100%;
+    padding: 1em;
+    text-align: center;
+    width: 170px;
+
+    strong {
+      display: block;
+      font-size: 2em;
+      text-align: center;
+    }
+
+    span {
+      display: block;
+    }
+
+    img {
+      height: 50%;
+    }
+  }
+
+  .thumbnail {
+    height: 100px;
+
+    img {
+      border-radius: 5px;
+      height: 75px;
+    }
+  }
+}
+
+img.img-cute {
+  bottom: -6px;
+  left: 45px;
+  position: relative;
+  width: 3em;
+}
+
+img.img-tiny {
+  width: 50px;
+}
+
+img.img-icon {
+  width: 1.2em;
+}
+
+img.img-responsive {
+  max-width: 100%;
+}
+
+img.avatar {
+  border-radius: 50%;
+  padding: 1em;
+  position: relative;
+  z-index: 2;
+}
+
+ul.associations {
+  list-style-type: none;
+}
+
+// footer
+footer {
+  #footer1,
+  #footer2,
+  #footer3 {
+    padding-bottom: 2em;
+    padding-top: 1em;
+    text-align: left;
+
+    ul {
+      list-style-position: outside;
+      list-style-type: none;
+      margin-left: 0;
+      padding-left: 0;
+    }
+
+    a {
+      color: $navbar-default-link-color;
+      text-decoration: none;
+    }
+
+    a:hover {
+      color: $navbar-default-link-hover-color;
+    }
+
+    a:active {
+      color: $navbar-default-link-active-color;
+    }
+  }
+}
+
+// ensure footer is pushed to bottom of browser window
+#maincontainer {
+  max-width: 2500px;
+  min-height: 80%;
+  padding-bottom: 1em;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+.container {
+  min-width: 90%;
+}
+
+// Autosuggest
+.ui-autocomplete {
+  background: $white;
+  z-index: $highest-level;
+}
+
+.alert {
+  a {
+    font-weight: 800;
+  }
+}
+
+/* override "info" alert boxes to be green, not blue, on Growstuff */
+$state-info-text: darken($green, 10%);
+$state-info-bg: lighten($green, 50%);
+
+/* and set "success" to be the same, as it was just very slightly
+ * different because the default bootstrap green is slightly different
+ * from ours */
+$state-success-text: darken($green, 10%);
+$state-success-bg: lighten($green, 50%);
+
+.hide {
+  display: none;
+}
+
+.panel {
+  .dl-horizontal {
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+label.required:after {
+  color: red;
+  content: " *";
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ul.plantings {
+  list-style-type: none;
+}
+
+ul.thumbnail-buttons {
+  list-style-type: none;
+  text-align: right;
+}
+
+.hover-wrapper .text {
+  position: absolute;
+  visibility: hidden;
+}
+
+.hover-wrapper:hover .text {
+  visibility: visible;
+}
+
+.form-page {
+  text-align: center;
+
+  .form-card {
+    display: inline-block;
+    margin-top: 0.5em;
+    max-width: 800px;
+    padding: 1em;
+    text-align: center;
+  }
+
+  // A checkbox sits next to its label, in the middle, as the rest of the form does
+  // (Bootstrap 5 floats it to the left edge of the field).
+  .form-check {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-left: 0;
+
+    .form-check-input {
+      float: none;
+      margin: 0.2em 0 0;
+    }
+  }
+}
+.text-muted {
+  color: $blue;
+}
+.jumbotron {
+  background-color: $beige;
+  margin-bottom: 1em;
+  padding-bottom: 30px;
+  padding-top: 30px;
+
+  h1 {
+    font-size: 400%;
+  }
+
+  // signup widget on homepage
+  .signup {
+    background-color: darken($green, 20%);
+    border: 1px solid darken($green, 20%);
+    color: $white;
+    border-radius: 6px;
+    line-height: 200%;
+    padding: 15px;
+    text-align: center;
+
+    .btn-info {
+      background-color: $blue;
+    }
+  }
+
+  .info {
+    padding: 0.5em;
+    text-align: center;
+  }
+}
+
+.breadcrumb {
+  background-color: $beige;
+}
+
+.chip {
+  background-color: lighten($brown, 20%);
+  border-radius: 25px;
+  color: $white;
+  display: inline-block;
+  height: 30px;
+  line-height: 30px;
+  margin: 0.2em;
+  padding: 0 25px;
+
+  a {
+    color: $white;
+  }
+
+  img {
+    border-radius: 50%;
+    float: left;
+    height: 30px;
+    margin: 0 10px 0 -25px;
+    width: 30px;
+  }
+}
+
+.progress-fade {
+  cursor: pointer;
+  float: left;
+  position: relative;
+}
+
+.progress-fade::before {
+  background: $beige;
+  bottom: 0;
+  content: "";
+  display: block;
+  left: 0;
+  opacity: 0.7;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transition: background 0.3s linear;
+}
+
+.progress-fade:hover::before {
+  background: none;
+}
+
+// Bootstrap 5 dropped text-justify.
+.text-justify {
+  text-align: justify;
+}
+
+// Buttons are uppercase, as in the old skin, except link buttons.
+// Bootstrap only draws the button shadow when $enable-shadows is on, so draw it here.
+.btn {
+  box-shadow: var(--bs-btn-box-shadow);
+  text-transform: uppercase;
+
+  &:active,
+  &.active {
+    box-shadow: $btn-active-box-shadow;
+  }
+
+  &:disabled,
+  &.disabled {
+    box-shadow: none;
+  }
+}
+
+.btn-link {
+  text-transform: none;
+}
+
+// A .btn with no colour variant is plain text in Bootstrap 5, so it reads as a
+// link. Draw it as the old skin did: no fill, dark text, raised, darker while hovered.
+.btn:not([class*="btn-"]) {
+  --bs-btn-color: #{$body-color};
+  --bs-btn-hover-color: #{$body-color};
+  --bs-btn-hover-bg: rgba(0, 0, 0, 0.12);
+  --bs-btn-active-color: #{$body-color};
+  --bs-btn-active-bg: rgba(0, 0, 0, 0.12);
+}
+
+// Progress bar colours by state (Planting#progress_state).
+.progress-bar--growing {
+  background-color: var(--bs-info);
+}
+
+.progress-bar--harvesting {
+  background-color: var(--bs-success);
+}
+
+.progress-bar--late {
+  background-color: var(--bs-warning);
+}
+
+.progress-bar--super_late {
+  background-color: var(--bs-danger);
+}
+
+// Grey, not --bs-secondary: the site's secondary colour is its dark blue.
+.progress-bar--finished {
+  background-color: var(--bs-gray-600);
+}
+
+// The card variables drop the card's border, which also drew the line under a
+// header, so put that line back.
+.card-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+// Breadcrumb links were grey in the old skin. Bootstrap 5 uses the link green,
+// which is 4.12:1 on the beige page, under the 4.5:1 minimum.
+.breadcrumb-item a {
+  color: #5f5e5c;
+}
+
+// Sidebar text (the skip link, the nav links and button, the blurb) starts where
+// the text inside a card beside it starts, instead of at the card's edge.
+.sidebar-inset {
+  padding-inline: var(--bs-card-spacer-x, 1rem);
+}
+
+.layout-nav {
+  // Links in the link colour and underlined, so they read as links. The page
+  // you are on is bold and not underlined, since it goes nowhere new.
+  .nav-link {
+    padding-block: 0.25rem;
+    color: var(--bs-link-color);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--bs-link-hover-color);
+    }
+
+    &[aria-current="page"] {
+      font-weight: bold;
+      text-decoration: none;
+    }
+  }
+
+  .btn {
+    margin-top: 0.5rem;
+  }
+}

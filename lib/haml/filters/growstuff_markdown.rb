@@ -1,60 +1,61 @@
-require 'bluecloth'
+# frozen_string_literal: true
 
-module Haml::Filters
-  module GrowstuffMarkdown
+# TODO: Move this file/helper elsewhere, as it is used as a pre filter rather than plugging into the haml architecture
+class Haml::Filters
+  class GrowstuffMarkdown
     CROP_REGEX = /(?<!\\)\[([^\[\]]+?)\]\(crop\)/
     MEMBER_REGEX = /(?<!\\)\[([^\[\]]+?)\]\(member\)/
-    MEMBER_AT_REGEX = /(?<!\\)(\@\w+)/
-    MEMBER_ESCAPE_AT_REGEX = /(?<!\\)\\(?=\@\w+)/
-    include Haml::Filters::Base
+    MEMBER_AT_REGEX = /(?<!\\)(@\w+)/
+    MEMBER_COMBINED_REGEX = Regexp.union(MEMBER_REGEX, MEMBER_AT_REGEX)
+    MEMBER_ESCAPE_AT_REGEX = /(?<!\\)\\(?=@\w+)/
+    HOST = Rails.application.config.host
 
-    def render(text)
+    def expand_crops!(text)
       # turn [tomato](crop) into [tomato](http://growstuff.org/crops/tomato)
-      expanded = text.gsub(CROP_REGEX) do |m|
-        crop_str = $1
+      text.gsub!(CROP_REGEX) do
+        crop_str = Regexp.last_match(1)
         # find crop case-insensitively
         crop = Crop.where('lower(name) = ?', crop_str.downcase).first
-        if crop
-          url = Rails.application.routes.url_helpers.crop_url(crop, host: Growstuff::Application.config.host)
-          "[#{crop_str}](#{url})"
-        else
-          crop_str
-        end
+        crop_link crop, crop_str
       end
+      text
+    end
 
+    def expand_members!(text)
       # turn [jane](member) into [jane](http://growstuff.org/members/jane)
-      expanded = expanded.gsub(MEMBER_REGEX) do |m|
-        member_str = $1
-        # find member case-insensitively
-        member = Member.case_insensitive_login_name(member_str).first
-        if member
-          url = Rails.application.routes.url_helpers.member_url(member, only_path: true)
-          "[#{member_str}](#{url})"
-        else
-          member_str
-        end
-      end
-
       # turn @jane into [@jane](http://growstuff.org/members/jane)
-      expanded = expanded.gsub(MEMBER_AT_REGEX) do |m|
-        member_str = $1
-        # find member case-insensitively
-        member = Member.case_insensitive_login_name(member_str[1..-1]).first
-        if member
-          url = Rails.application.routes.url_helpers.member_url(member, only_path: true)
-          "[#{member_str}](#{url})"
-        else
-          member_str
-        end
+      text.gsub!(MEMBER_COMBINED_REGEX) do
+        member_str = Regexp.last_match(1) || Regexp.last_match(2)
+        member = find_member(member_str)
+        member_link(member, member_str)
       end
 
-      expanded = expanded.gsub(MEMBER_ESCAPE_AT_REGEX, "")
+      text.gsub!(MEMBER_ESCAPE_AT_REGEX, '')
+      text
+    end
 
-      BlueCloth.new(expanded).to_html
+    def member_link(member, link_text)
+      if member
+        url = Rails.application.routes.url_helpers.member_url(member, only_path: true)
+        "[#{link_text}](#{url})"
+      else
+        link_text
+      end
+    end
+
+    def crop_link(crop, link_text)
+      if crop
+        url = Rails.application.routes.url_helpers.crop_url(crop, only_path: true)
+        "[#{link_text}](#{url})"
+      else
+        link_text
+      end
+    end
+
+    def find_member(login_name)
+      # Remove @ if present
+      login_name = login_name[1..] if login_name.start_with?('@')
+      Member.case_insensitive_login_name(login_name).first
     end
   end
-
-  # Register it as the handler for the :growstuff_markdown HAML command.
-  # The automatic system gives us :growstuffmarkdown, which is ugly.
-  defined['growstuff_markdown'] = GrowstuffMarkdown
 end

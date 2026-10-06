@@ -1,58 +1,80 @@
-class SeedsController < ApplicationController
-  before_action :authenticate_member!, except: [:index, :show]
-  load_and_authorize_resource
-  respond_to :html, :json
-  respond_to :csv, only: :index
-  respond_to :rss, only: :index
+# frozen_string_literal: true
 
-  # GET /seeds
-  # GET /seeds.json
+class SeedsController < DataController
   def index
-    @owner = Member.find_by(slug: params[:owner])
-    @crop = Crop.find_by(slug: params[:crop])
-    @seeds = seeds(owner: @owner, crop: @crop)
+    @seeds = Seed.all
+
+    if params[:member_slug].present?
+      @owner = Member.find_by!(slug: params[:member_slug])
+      @seeds = @seeds.where(owner_id: @owner.id)
+    end
+
+    if params[:crop_slug].present?
+      @crop = Crop.find_by(slug: params[:crop_slug])
+      @seeds = @seeds.where(crop_id: @crop.id) if @crop
+    end
+
+    if params[:planting_id].present?
+      @planting = Planting.find_by(slug: params[:planting_id])
+      @seeds = @seeds.where(parent_planting_id: @planting.id) if @planting
+    end
+
+    @seeds = @seeds.where(tradable_to: params[:tradeable_to]) if params[:tradeable_to].present?
+
+    @show_all = (params[:all] == '1')
+    @seeds = @seeds.current unless @show_all
+
     @filename = csv_filename
+    @seeds = @seeds.includes(:crop, :owner)
+                   .order(created_at: :desc)
+                   .paginate(page: params[:page], per_page: 30)
 
     respond_with(@seeds)
   end
 
-  # GET /seeds/1
-  # GET /seeds/1.json
   def show
+    @photos = @seed.photos.includes(:owner).order(created_at: :desc, id: :desc).paginate(page: params[:page], per_page: 30)
     respond_with(@seed)
   end
 
-  # GET /seeds/new
-  # GET /seeds/new.json
   def new
     @seed = Seed.new
+    @seed.source = 'my own seed saving'
 
-    # using find_by_id here because it returns nil, unlike find
-    @crop = Crop.find_or_initialize_by(id: params[:crop_id])
+    if params[:planting_slug]
+      @planting = Planting.find_by(slug: params[:planting_slug])
+    else
+      @crop = Crop.find_or_initialize_by(id: params[:crop_id])
+    end
+    return render json: SeedFormSerializer.new(@planting, member: current_member) if request.format.json? && @planting.present?
+
     respond_with(@seed)
   end
 
-  # GET /seeds/1/edit
   def edit; end
 
-  # POST /seeds
-  # POST /seeds.json
   def create
     @seed = Seed.new(seed_params)
+    @seed.source ||= 'my own seed saving'
+    @seed.finished ||= false
     @seed.owner = current_member
-    flash[:notice] = "Successfully added #{@seed.crop} seed to your stash." if @seed.save
-    respond_with(@seed)
+    @seed.crop = @seed.parent_planting.crop if @seed.parent_planting
+    saved = @seed.save
+    return render_created_json if request.format.json? && @seed.parent_planting.present?
+
+    flash[:notice] = t('seeds.added_to_stash', crop: @seed.crop) if saved
+    if params[:return] == 'planting'
+      respond_with(@seed, location: @seed.parent_planting)
+    else
+      respond_with(@seed)
+    end
   end
 
-  # PUT /seeds/1
-  # PUT /seeds/1.json
   def update
-    flash[:notice] = 'Seed was successfully updated.' if @seed.update(seed_params)
+    flash[:notice] = t('seeds.updated') if @seed.update(seed_params)
     respond_with(@seed)
   end
 
-  # DELETE /seeds/1
-  # DELETE /seeds/1.json
   def destroy
     @seed.destroy
     respond_with(@seed)
@@ -60,29 +82,33 @@ class SeedsController < ApplicationController
 
   private
 
+  # Used by the React garden cards, which stay on the page and say the seeds
+  # were saved (with a link to them). No flash: nothing redirects, so it would
+  # turn up on whichever page is loaded next.
+  def render_created_json
+    if @seed.persisted?
+      render json: { seed: { id: @seed.id, url: seed_path(@seed) } }, status: :created
+    else
+      render json: { errors: @seed.errors }, status: :unprocessable_content
+    end
+  end
+
   def seed_params
     params.require(:seed).permit(
       :crop_id, :description, :quantity, :plant_before,
-      :days_until_maturity_min, :days_until_maturity_max, :organic, :gmo,
-      :heirloom, :tradable_to, :slug
+      :parent_planting_id, :saved_at,
+      :days_until_maturity_min, :days_until_maturity_max,
+      :organic, :gmo, :source,
+      :heirloom, :tradable_to, :slug,
+      :finished, :finished_at
     )
-  end
-
-  def seeds(owner: nil, crop: nil)
-    if owner
-      owner.seeds
-    elsif crop
-      crop.seeds
-    else
-      Seed
-    end.includes(:owner, :crop).paginate(page: params[:page])
   end
 
   def csv_filename
     if @owner
-      "Growstuff-#{@owner}-Seeds-#{Time.zone.now.to_s(:number)}.csv"
+      "Growstuff-#{@owner.to_param}-Seeds-#{Time.zone.now.to_fs(:number)}.csv"
     else
-      "Growstuff-Seeds-#{Time.zone.now.to_s(:number)}.csv"
+      "Growstuff-Seeds-#{Time.zone.now.to_fs(:number)}.csv"
     end
   end
 end

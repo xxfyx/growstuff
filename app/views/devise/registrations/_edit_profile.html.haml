@@ -1,22 +1,47 @@
 = form_for(resource, as: resource_name,
-    url: registration_path(resource_name),
-    html: { method: :put, class: 'form-horizontal' }) do |f|
+    url: registration_path(resource_name) + '#profile',
+    html: { method: :put }) do |f|
   %br/
-  = devise_error_messages!
+  = render 'devise/shared/error_messages', resource: resource
 
-  .form-group
-    = f.label :location, 'Your location', class: 'control-label col-md-2'
+  .row.mb-3
+    = f.label :location, 'Your location', class: 'col-form-label col-md-2'
     .col-md-8
       = f.text_field :location, autocomplete: "off", class: 'form-control'
-      %span.help-block This will be displayed on a map. You can be as detailed or vague as you like.
+      %span.form-text This will be displayed on a map. You can be as detailed or vague as you like.
 
-  .form-group
-    = f.label :bio, class: 'control-label col-md-2'
+  .row.mb-3
+    = f.label :bio, class: 'col-form-label col-md-2'
     .col-md-8
-      = f.text_area :bio, rows: 6, class: 'form-control'
+      = f.text_area :bio, rows: 6, class: 'form-control', placeholder: "I'm am XYZ gardener interested in A, B, C"
 
-  .form-group
-    %label.control-label.col-md-2
+  .row.mb-3
+    = f.label :website_url, 'Website', class: 'col-form-label col-md-2'
+    .col-md-8
+      = f.url_field :website_url, class: 'form-control', placeholder: "https://you.example.com/"
+
+  .row.mb-3
+    = f.label :instagram_handle, 'Instagram', class: 'col-form-label col-md-2'
+    .col-md-8
+      = f.text_field :instagram_handle, class: 'form-control', placeholder: 'your_handle'
+
+  .row.mb-3
+    = f.label :facebook_handle, 'Facebook', class: 'col-form-label col-md-2'
+    .col-md-8
+      = f.text_field :facebook_handle, class: 'form-control', placeholder: 'your_handle'
+
+  .row.mb-3
+    = f.label :bluesky_handle, 'Bluesky', class: 'col-form-label col-md-2'
+    .col-md-8
+      = f.text_field :bluesky_handle, class: 'form-control', placeholder: 'your_handle'
+
+  .row.mb-3
+    = f.label :other_url, 'Other URL', class: 'col-form-label col-md-2'
+    .col-md-8
+      = f.url_field :other_url, class: 'form-control', placeholder: "https://you.example.com/"
+
+  .row.mb-3
+    %label.form-label.col-md-2
       Profile picture
     .col-md-8
       = render partial: "members/avatar", locals: { member: @member }
@@ -25,9 +50,9 @@
           %br/
           To change your profile picture, visit
           = succeed "." do
-            = link_to 'gravatar.com', "http://gravatar.com/"
+            = link_to 'gravatar.com', "https://gravatar.com/"
 
-  .form-group
-    .form-actions.col-md-offset-2.col-md-8
+  .row.mb-3
+    .offset-md-2.col-md-8
       = f.submit "Save", class: 'btn btn-primary'
       = f.hidden_field(:tos_agreement, value: true)

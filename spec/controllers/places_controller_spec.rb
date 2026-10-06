@@ -1,42 +1,61 @@
-## DEPRECATION NOTICE: Do not add new tests to this file!
-##
-## View and controller tests are deprecated in the Growstuff project.
-## We no longer write new view and controller tests, but instead write
-## feature tests (in spec/features) using Capybara (https://github.com/jnicklas/capybara).
-## These test the full stack, behaving as a browser, and require less complicated setup
-## to run. Please feel free to delete old view/controller tests as they are reimplemented
-## in feature tests.
-##
-## If you submit a pull request containing new view or controller tests, it will not be
-## merged.
+# frozen_string_literal: true
 
 require 'rails_helper'
 
 describe PlacesController do
-  before :each do
+  before do
     controller.stub(:current_member) { nil }
   end
 
+  describe "GET index" do
+    before do
+      @london_member = create(:london_member)
+    end
+
+    it "renders the index template for HTML request" do
+      get :index
+      response.should render_template(:index)
+    end
+
+    it "returns JSON with paginated located members" do
+      get :index, format: :json
+      response.should be_successful
+      json = JSON.parse(response.body)
+      expect(json).to be_an(Array)
+      expect(json.first["login_name"]).to eq(@london_member.login_name)
+      expect(json.first.keys).to match_array(%w(id login_name slug location latitude longitude))
+    end
+  end
+
   describe "GET show" do
-    before(:each) do
-      @member_london = FactoryGirl.create(:london_member)
-      @member_south_pole = FactoryGirl.create(:south_pole_member)
+    before do
+      @london_member = create(:london_member)
+      @edinburgh_member = create(:edinburgh_member)
     end
 
     it "assigns place name" do
-      get :show, place: @member_london.location
-      assigns(:place).should eq @member_london.location
+      get :show, params: { place: @london_member.location }
+      assigns(:place).should eq @london_member.location
     end
 
     it "assigns nearby members" do
-      get :show, place: @member_london.location
-      assigns(:nearby_members).should eq [@member_london, @member_south_pole]
+      get :show, params: { place: @london_member.location }
+      assigns(:nearby_members).should eq [@london_member, @edinburgh_member]
+    end
+
+    it "returns JSON with nearby members" do
+      get :show, params: { place: @london_member.location }, format: :json
+      response.should be_successful
+      json = JSON.parse(response.body)
+      expect(json).to be_an(Array)
+      expect(json.map { |m| m["login_name"] }).to eq([@london_member.login_name, @edinburgh_member.login_name])
+      expect(json.first.keys).to match_array(%w(id login_name slug location latitude longitude))
     end
   end
 
   describe "GET search" do
     it "redirects to the new place" do
-      get :search, new_place: "foo"
+      get :search, params: { new_place: "foo" }
       response.should redirect_to place_path("foo")
     end
   end

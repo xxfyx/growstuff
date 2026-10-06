@@ -31,7 +31,7 @@ jQuery ->
 
     if el.data( 'uiAutocomplete' )
       el.data( 'uiAutocomplete' )._renderItem = ( ul, item ) ->
-        $( '<li></li>' )
+        $( '<li class="list-group-item"></li>' )
           .data( 'item.autocomplete', item )
-          .append( "<a>#{item.name}</a>" )
+          .append( if item.matched_alternate_name then "<a>#{item.matched_alternate_name} <small class=\"text-muted\">(#{item.name})</small></a>" else "<a>#{item.name}</a>" )
           .appendTo( ul )
